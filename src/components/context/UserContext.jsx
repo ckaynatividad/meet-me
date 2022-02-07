@@ -1,11 +1,23 @@
+import fetchUser from '../../services/user'
+
 const { createContext, useState, useEffect, useContext } = require('react')
 
 const UserContext = createContext()
 
-export default function UserProvider({ children }) {
+export function UserProvider({ children }) {
   const [user, setUser] = useState({})
 
-  return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>
+  useEffect(() => {
+    fetchUser()
+      .then((fetchedUser) => {
+        setUser(fetchedUser)
+      })
+      .catch((error) => {
+        throw new Error(`Error: ${error}`)
+      })
+  }, [])
+
+  return <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
 }
 
 export const useUser = () => {
